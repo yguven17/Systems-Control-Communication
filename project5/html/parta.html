@@ -1,0 +1,1364 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>QPSK Modulator/Demodulator Example</title><meta name="generator" content="MATLAB 9.9"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2021-05-09"><meta name="DC.source" content="parta.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>QPSK Modulator/Demodulator Example</h1><!--introduction--><p>This documents describes/implements the QPSK modulation and demodulation of a song signal.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#5">Program Initialization</a></li><li><a href="#6">Read and Display an Example Image</a></li><li><a href="#9">Convert Image to  a Binary Vector</a></li><li><a href="#14">Generate Modulated Signal</a></li><li><a href="#21">to keep BER values for different SNR values</a></li><li><a href="#28">Channel Effect</a></li><li><a href="#35">The QPSK Receiver Processing</a></li><li><a href="#45">Constellation Estimates</a></li><li><a href="#46">Bit Estimates</a></li><li><a href="#50">disp theta vs ber graph</a></li></ul></div><pre>    Prepared for ELEC 301</pre><pre>   by Alper T. Erdogan</pre><pre>          *16.03.2020*</pre><p>edited by    Yakup Enes G&uuml;ven 64045</p><h2 id="5">Program Initialization</h2><pre class="codeinput"><span class="comment">%Clear Variables and Close All Figure Windows</span>
+
+<span class="comment">% Clear all previous variables</span>
+clear
+<span class="comment">% Close all previous figure windows</span>
+close <span class="string">all</span>
+</pre><h2 id="6">Read and Display an Example Image</h2><p><b>cameraman.tif</b> is an example gray-level image provided my matlab</p><p>Load the Cameraman Image</p><pre class="codeinput">Im = imread(<span class="string">'cameraman.tif'</span>);
+<span class="comment">% Extract part of the image</span>
+Im=Im(51:100,101:150);
+</pre><p>Display the image</p><pre class="codeinput">imshow(Im);
+</pre><img vspace="5" hspace="5" src="parta_01.png" alt=""> <h2 id="9">Convert Image to  a Binary Vector</h2><p>We need to convert the image to a binary bit sequence</p><p>Convert 256x256 image matrix to an image (column) vector (of size 256^2x1) by concatenating columns</p><pre class="codeinput">Imv=Im(:);
+</pre><p>Convert each the number in each row to a binary vector</p><pre class="codeinput">Imvb=de2bi(Imv);
+</pre><p>Note that <b>Imvb</b> has size 256^2x8</p><p>Now generate a row vector containing all bits</p><pre class="codeinput">Imvbt=Imvb';
+s=Imvbt(:)';
+</pre><h2 id="14">Generate Modulated Signal</h2><p>QPSK Modulated Signal</p><p>From the single bit sequence generate a vector sequence</p><pre class="codeinput">sv=[s(1:2:end);
+    s(2:2:end)];
+</pre><p>QPSK Constellation Mapper [0;0]-&gt; -1-i [0;1]-&gt; -1+i [1;0]-&gt;  1-i [1;1]-&gt;  1+i</p><pre class="codeinput"><span class="keyword">for</span> k=1:size(sv,2)
+    <span class="keyword">switch</span> num2str(sv(:,k)')
+        <span class="keyword">case</span> <span class="string">'0  0'</span>
+            c(k)=-1-i;
+        <span class="keyword">case</span> <span class="string">'1  0'</span>
+            c(k)=1-i;
+        <span class="keyword">case</span> <span class="string">'0  1'</span>
+            c(k)=-1+i;
+        <span class="keyword">otherwise</span>
+            c(k)=1+i;
+        <span class="keyword">end</span>
+<span class="keyword">end</span>
+<span class="comment">% Normalize the power to 1</span>
+c=c/sqrt(2);
+</pre><p>Rectangle Modulation</p><pre class="codeinput"><span class="comment">% Sample Rate</span>
+Fsampling=2^19;
+<span class="comment">% Sample Intervale</span>
+Tsampling=1/Fsampling;
+<span class="comment">% Symbol Rate</span>
+Fsymbol=2^13;
+<span class="comment">% Symbol Period</span>
+Tsymbol=1/Fsymbol;
+<span class="comment">% Number of Samples per Symbol Period</span>
+Ns=Tsymbol/Tsampling;
+</pre><p>Baseband Signal (samples)</p><pre class="codeinput">xb=kron(c,ones(1,Ns));
+</pre><p>Carrier frequency:</p><p><img src="parta_eq16958189372607601910.png" alt="$f_c=60kHz$"></p><pre class="codeinput">fc=60e3; <span class="comment">% 60 kHz;</span>
+
+<span class="comment">%define theta</span>
+theta=(0:pi/10:2*pi);
+</pre><h2 id="21">to keep BER values for different SNR values</h2><pre class="codeinput">BER10=(0:length(theta)-1);
+BER1=(0:length(theta)-1);
+</pre><pre class="codeinput"><span class="keyword">for</span> a=1:2
+</pre><pre class="codeinput"> <span class="keyword">for</span> i=1:length(theta)
+</pre><pre class="codeinput"><span class="comment">% Carrier signal:  _</span>
+</pre><p><img src="parta_eq07062566232886380311.png" alt="$c(t)=cos(2\pi f_c t)$"></p><pre class="codeinput">t=(0:1:(length(xb)-1))*Tsampling;
+cost=cos(2*pi*fc*t);
+sint=sin(2*pi*fc*t);
+</pre><p>Transmitter output</p><p><img src="parta_eq10295880343009821146.png" alt="$x(t)=Re(xb(t))cos(2\pi f_c t)-Im(xb(t))sin(2\pi f_c t)$"></p><pre class="codeinput">x=real(xb).*cost-imag(xb).*sint;
+</pre><h2 id="28">Channel Effect</h2><p>We add some noise</p><p>First calculate average signal energy (per sample)</p><pre class="codeinput">sigpow=mean(x.^2);
+</pre><p>Define SNR level in (dB)</p><pre class="codeinput"><span class="keyword">if</span> a==1
+    SNR=10;
+<span class="keyword">else</span> a==2
+    SNR=1;
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+</pre><p>Noise Level</p><pre class="codeinput">NoiseAmp=sqrt(10^(-SNR/10)*sigpow);
+</pre><p>Generate Noise signal as Gaussian Noise</p><pre class="codeinput">noise=NoiseAmp*randn(1,length(x));
+</pre><p>Noisy received signal</p><p><img src="parta_eq04672482762662377281.png" alt="$y(t)=x(t)+n(t)$"></p><pre class="codeinput">y=x+noise;
+</pre><h2 id="35">The QPSK Receiver Processing</h2><p>Coherent QPSK Receiver operation</p><p>First extract real component baseband signal</p><p><img src="parta_eq11100808654785595335.png" alt="$u_r(t)=2x(t)cos(2\pi f_c t)$"></p><pre class="codeinput">ur=2*y.*cos((2*pi*fc*t)+theta(i));
+</pre><p>Then low pass filter this signal</p><p><img src="parta_eq01107566790791429087.png" alt="$z_r(t)=u_r(t)*h_{LP}(t)$"></p><pre class="codeinput">zr = lowpass(ur,30e3,Fsampling);
+</pre><p>Then extract the imaginary component baseband signal</p><p><img src="parta_eq03403474575010259504.png" alt="$u_i(t)=2x(t)sin(2 \pi f_c t)$"></p><pre class="codeinput">ui=-2*y.*sin((2*pi*fc*t)+theta(i));
+</pre><p>Then low pass filter this signal</p><p><img src="parta_eq17072660596719322819.png" alt="$z_i(t)=u_i(t)*h_{LP}(t)$"></p><pre class="codeinput">zi = lowpass(ui,30e3,Fsampling);
+</pre><p>Basband signal</p><pre class="codeinput">z=zr+i*zi;
+</pre><h2 id="45">Constellation Estimates</h2><p>We sample the baseband received signal to get noisy estimates of transmitted constellation point. This is not the best way though. Any other suggestions for improvement?</p><pre class="codeinput">ce=z(ceil(Ns/2):Ns:length(z));
+</pre><h2 id="46">Bit Estimates</h2><p>We implement QPSK Demapper to extract bits from constellation estimates</p><p>Check which quadrant ce lies in</p><pre class="codeinput">ser=real(ce)&gt;0;
+sei=imag(ce)&gt;0;
+se(1:2:(2*length(ser)))=ser;
+se(2:2:(2*length(ser)))=sei;
+</pre><p>Calculate Bit Error Rate</p><pre class="codeinput"><span class="keyword">if</span> a==1
+    BER10(i)=sum(se~=s)/length(s)
+<span class="keyword">else</span> a==2
+    BER1(i)=sum(se~=s)/length(s)
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">
+BER10 =
+
+  Columns 1 through 7
+
+    0.3487    1.0000    2.0000    3.0000    4.0000    5.0000    6.0000
+
+  Columns 8 through 14
+
+    7.0000    8.0000    9.0000   10.0000   11.0000   12.0000   13.0000
+
+  Columns 15 through 21
+
+   14.0000   15.0000   16.0000   17.0000   18.0000   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+BER10 =
+
+  Columns 1 through 7
+
+    0.3487    0.4755    2.0000    3.0000    4.0000    5.0000    6.0000
+
+  Columns 8 through 14
+
+    7.0000    8.0000    9.0000   10.0000   11.0000   12.0000   13.0000
+
+  Columns 15 through 21
+
+   14.0000   15.0000   16.0000   17.0000   18.0000   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+BER10 =
+
+  Columns 1 through 7
+
+    0.3487    0.4755    0.4755    3.0000    4.0000    5.0000    6.0000
+
+  Columns 8 through 14
+
+    7.0000    8.0000    9.0000   10.0000   11.0000   12.0000   13.0000
+
+  Columns 15 through 21
+
+   14.0000   15.0000   16.0000   17.0000   18.0000   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+BER10 =
+
+  Columns 1 through 7
+
+    0.3487    0.4755    0.4755    0.5402    4.0000    5.0000    6.0000
+
+  Columns 8 through 14
+
+    7.0000    8.0000    9.0000   10.0000   11.0000   12.0000   13.0000
+
+  Columns 15 through 21
+
+   14.0000   15.0000   16.0000   17.0000   18.0000   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+BER10 =
+
+  Columns 1 through 7
+
+    0.3487    0.4755    0.4755    0.5402    0.7218    5.0000    6.0000
+
+  Columns 8 through 14
+
+    7.0000    8.0000    9.0000   10.0000   11.0000   12.0000   13.0000
+
+  Columns 15 through 21
+
+   14.0000   15.0000   16.0000   17.0000   18.0000   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+BER10 =
+
+  Columns 1 through 7
+
+    0.3487    0.4755    0.4755    0.5402    0.7218    0.7261    6.0000
+
+  Columns 8 through 14
+
+    7.0000    8.0000    9.0000   10.0000   11.0000   12.0000   13.0000
+
+  Columns 15 through 21
+
+   14.0000   15.0000   16.0000   17.0000   18.0000   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+BER10 =
+
+  Columns 1 through 7
+
+    0.3487    0.4755    0.4755    0.5402    0.7218    0.7261    0.7261
+
+  Columns 8 through 14
+
+    7.0000    8.0000    9.0000   10.0000   11.0000   12.0000   13.0000
+
+  Columns 15 through 21
+
+   14.0000   15.0000   16.0000   17.0000   18.0000   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+BER10 =
+
+  Columns 1 through 7
+
+    0.3487    0.4755    0.4755    0.5402    0.7218    0.7261    0.7261
+
+  Columns 8 through 14
+
+    0.7221    8.0000    9.0000   10.0000   11.0000   12.0000   13.0000
+
+  Columns 15 through 21
+
+   14.0000   15.0000   16.0000   17.0000   18.0000   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+BER10 =
+
+  Columns 1 through 7
+
+    0.3487    0.4755    0.4755    0.5402    0.7218    0.7261    0.7261
+
+  Columns 8 through 14
+
+    0.7221    0.5682    9.0000   10.0000   11.0000   12.0000   13.0000
+
+  Columns 15 through 21
+
+   14.0000   15.0000   16.0000   17.0000   18.0000   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+BER10 =
+
+  Columns 1 through 7
+
+    0.3487    0.4755    0.4755    0.5402    0.7218    0.7261    0.7261
+
+  Columns 8 through 14
+
+    0.7221    0.5682    0.4773   10.0000   11.0000   12.0000   13.0000
+
+  Columns 15 through 21
+
+   14.0000   15.0000   16.0000   17.0000   18.0000   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+BER10 =
+
+  Columns 1 through 7
+
+    0.3487    0.4755    0.4755    0.5402    0.7218    0.7261    0.7261
+
+  Columns 8 through 14
+
+    0.7221    0.5682    0.4773    0.4767   11.0000   12.0000   13.0000
+
+  Columns 15 through 21
+
+   14.0000   15.0000   16.0000   17.0000   18.0000   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+BER10 =
+
+  Columns 1 through 7
+
+    0.3487    0.4755    0.4755    0.5402    0.7218    0.7261    0.7261
+
+  Columns 8 through 14
+
+    0.7221    0.5682    0.4773    0.4767    0.4767   12.0000   13.0000
+
+  Columns 15 through 21
+
+   14.0000   15.0000   16.0000   17.0000   18.0000   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+BER10 =
+
+  Columns 1 through 7
+
+    0.3487    0.4755    0.4755    0.5402    0.7218    0.7261    0.7261
+
+  Columns 8 through 14
+
+    0.7221    0.5682    0.4773    0.4767    0.4767    0.4686   13.0000
+
+  Columns 15 through 21
+
+   14.0000   15.0000   16.0000   17.0000   18.0000   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+BER10 =
+
+  Columns 1 through 7
+
+    0.3487    0.4755    0.4755    0.5402    0.7218    0.7261    0.7261
+
+  Columns 8 through 14
+
+    0.7221    0.5682    0.4773    0.4767    0.4767    0.4686    0.2869
+
+  Columns 15 through 21
+
+   14.0000   15.0000   16.0000   17.0000   18.0000   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+BER10 =
+
+  Columns 1 through 7
+
+    0.3487    0.4755    0.4755    0.5402    0.7218    0.7261    0.7261
+
+  Columns 8 through 14
+
+    0.7221    0.5682    0.4773    0.4767    0.4767    0.4686    0.2869
+
+  Columns 15 through 21
+
+    0.2263   15.0000   16.0000   17.0000   18.0000   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+BER10 =
+
+  Columns 1 through 7
+
+    0.3487    0.4755    0.4755    0.5402    0.7218    0.7261    0.7261
+
+  Columns 8 through 14
+
+    0.7221    0.5682    0.4773    0.4767    0.4767    0.4686    0.2869
+
+  Columns 15 through 21
+
+    0.2263    0.2261   16.0000   17.0000   18.0000   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+BER10 =
+
+  Columns 1 through 7
+
+    0.3487    0.4755    0.4755    0.5402    0.7218    0.7261    0.7261
+
+  Columns 8 through 14
+
+    0.7221    0.5682    0.4773    0.4767    0.4767    0.4686    0.2869
+
+  Columns 15 through 21
+
+    0.2263    0.2261    0.2261   17.0000   18.0000   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+BER10 =
+
+  Columns 1 through 7
+
+    0.3487    0.4755    0.4755    0.5402    0.7218    0.7261    0.7261
+
+  Columns 8 through 14
+
+    0.7221    0.5682    0.4773    0.4767    0.4767    0.4686    0.2869
+
+  Columns 15 through 21
+
+    0.2263    0.2261    0.2261    0.2410   18.0000   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+BER10 =
+
+  Columns 1 through 7
+
+    0.3487    0.4755    0.4755    0.5402    0.7218    0.7261    0.7261
+
+  Columns 8 through 14
+
+    0.7221    0.5682    0.4773    0.4767    0.4767    0.4686    0.2869
+
+  Columns 15 through 21
+
+    0.2263    0.2261    0.2261    0.2410    0.4214   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+BER10 =
+
+  Columns 1 through 7
+
+    0.3487    0.4755    0.4755    0.5402    0.7218    0.7261    0.7261
+
+  Columns 8 through 14
+
+    0.7221    0.5682    0.4773    0.4767    0.4767    0.4686    0.2869
+
+  Columns 15 through 21
+
+    0.2263    0.2261    0.2261    0.2410    0.4214    0.4753   20.0000
+
+</pre><pre class="codeoutput">
+BER10 =
+
+  Columns 1 through 7
+
+    0.3487    0.4755    0.4755    0.5402    0.7218    0.7261    0.7261
+
+  Columns 8 through 14
+
+    0.7221    0.5682    0.4773    0.4767    0.4767    0.4686    0.2869
+
+  Columns 15 through 21
+
+    0.2263    0.2261    0.2261    0.2410    0.4214    0.4753    0.4755
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+
+BER1 =
+
+  Columns 1 through 7
+
+    0.3538    1.0000    2.0000    3.0000    4.0000    5.0000    6.0000
+
+  Columns 8 through 14
+
+    7.0000    8.0000    9.0000   10.0000   11.0000   12.0000   13.0000
+
+  Columns 15 through 21
+
+   14.0000   15.0000   16.0000   17.0000   18.0000   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+
+BER1 =
+
+  Columns 1 through 7
+
+    0.3538    0.4664    2.0000    3.0000    4.0000    5.0000    6.0000
+
+  Columns 8 through 14
+
+    7.0000    8.0000    9.0000   10.0000   11.0000   12.0000   13.0000
+
+  Columns 15 through 21
+
+   14.0000   15.0000   16.0000   17.0000   18.0000   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+
+BER1 =
+
+  Columns 1 through 7
+
+    0.3538    0.4664    0.5009    3.0000    4.0000    5.0000    6.0000
+
+  Columns 8 through 14
+
+    7.0000    8.0000    9.0000   10.0000   11.0000   12.0000   13.0000
+
+  Columns 15 through 21
+
+   14.0000   15.0000   16.0000   17.0000   18.0000   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+
+BER1 =
+
+  Columns 1 through 7
+
+    0.3538    0.4664    0.5009    0.5778    4.0000    5.0000    6.0000
+
+  Columns 8 through 14
+
+    7.0000    8.0000    9.0000   10.0000   11.0000   12.0000   13.0000
+
+  Columns 15 through 21
+
+   14.0000   15.0000   16.0000   17.0000   18.0000   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+
+BER1 =
+
+  Columns 1 through 7
+
+    0.3538    0.4664    0.5009    0.5778    0.6679    5.0000    6.0000
+
+  Columns 8 through 14
+
+    7.0000    8.0000    9.0000   10.0000   11.0000   12.0000   13.0000
+
+  Columns 15 through 21
+
+   14.0000   15.0000   16.0000   17.0000   18.0000   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+
+BER1 =
+
+  Columns 1 through 7
+
+    0.3538    0.4664    0.5009    0.5778    0.6679    0.7103    6.0000
+
+  Columns 8 through 14
+
+    7.0000    8.0000    9.0000   10.0000   11.0000   12.0000   13.0000
+
+  Columns 15 through 21
+
+   14.0000   15.0000   16.0000   17.0000   18.0000   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+
+BER1 =
+
+  Columns 1 through 7
+
+    0.3538    0.4664    0.5009    0.5778    0.6679    0.7103    0.7076
+
+  Columns 8 through 14
+
+    7.0000    8.0000    9.0000   10.0000   11.0000   12.0000   13.0000
+
+  Columns 15 through 21
+
+   14.0000   15.0000   16.0000   17.0000   18.0000   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+
+BER1 =
+
+  Columns 1 through 7
+
+    0.3538    0.4664    0.5009    0.5778    0.6679    0.7103    0.7076
+
+  Columns 8 through 14
+
+    0.6693    8.0000    9.0000   10.0000   11.0000   12.0000   13.0000
+
+  Columns 15 through 21
+
+   14.0000   15.0000   16.0000   17.0000   18.0000   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+
+BER1 =
+
+  Columns 1 through 7
+
+    0.3538    0.4664    0.5009    0.5778    0.6679    0.7103    0.7076
+
+  Columns 8 through 14
+
+    0.6693    0.5846    9.0000   10.0000   11.0000   12.0000   13.0000
+
+  Columns 15 through 21
+
+   14.0000   15.0000   16.0000   17.0000   18.0000   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+
+BER1 =
+
+  Columns 1 through 7
+
+    0.3538    0.4664    0.5009    0.5778    0.6679    0.7103    0.7076
+
+  Columns 8 through 14
+
+    0.6693    0.5846    0.5156   10.0000   11.0000   12.0000   13.0000
+
+  Columns 15 through 21
+
+   14.0000   15.0000   16.0000   17.0000   18.0000   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+
+BER1 =
+
+  Columns 1 through 7
+
+    0.3538    0.4664    0.5009    0.5778    0.6679    0.7103    0.7076
+
+  Columns 8 through 14
+
+    0.6693    0.5846    0.5156    0.4812   11.0000   12.0000   13.0000
+
+  Columns 15 through 21
+
+   14.0000   15.0000   16.0000   17.0000   18.0000   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+
+BER1 =
+
+  Columns 1 through 7
+
+    0.3538    0.4664    0.5009    0.5778    0.6679    0.7103    0.7076
+
+  Columns 8 through 14
+
+    0.6693    0.5846    0.5156    0.4812    0.4597   12.0000   13.0000
+
+  Columns 15 through 21
+
+   14.0000   15.0000   16.0000   17.0000   18.0000   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+
+BER1 =
+
+  Columns 1 through 7
+
+    0.3538    0.4664    0.5009    0.5778    0.6679    0.7103    0.7076
+
+  Columns 8 through 14
+
+    0.6693    0.5846    0.5156    0.4812    0.4597    0.4107   13.0000
+
+  Columns 15 through 21
+
+   14.0000   15.0000   16.0000   17.0000   18.0000   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+
+BER1 =
+
+  Columns 1 through 7
+
+    0.3538    0.4664    0.5009    0.5778    0.6679    0.7103    0.7076
+
+  Columns 8 through 14
+
+    0.6693    0.5846    0.5156    0.4812    0.4597    0.4107    0.3327
+
+  Columns 15 through 21
+
+   14.0000   15.0000   16.0000   17.0000   18.0000   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+
+BER1 =
+
+  Columns 1 through 7
+
+    0.3538    0.4664    0.5009    0.5778    0.6679    0.7103    0.7076
+
+  Columns 8 through 14
+
+    0.6693    0.5846    0.5156    0.4812    0.4597    0.4107    0.3327
+
+  Columns 15 through 21
+
+    0.2611   15.0000   16.0000   17.0000   18.0000   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+
+BER1 =
+
+  Columns 1 through 7
+
+    0.3538    0.4664    0.5009    0.5778    0.6679    0.7103    0.7076
+
+  Columns 8 through 14
+
+    0.6693    0.5846    0.5156    0.4812    0.4597    0.4107    0.3327
+
+  Columns 15 through 21
+
+    0.2611    0.2390   16.0000   17.0000   18.0000   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+
+BER1 =
+
+  Columns 1 through 7
+
+    0.3538    0.4664    0.5009    0.5778    0.6679    0.7103    0.7076
+
+  Columns 8 through 14
+
+    0.6693    0.5846    0.5156    0.4812    0.4597    0.4107    0.3327
+
+  Columns 15 through 21
+
+    0.2611    0.2390    0.2500   17.0000   18.0000   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+
+BER1 =
+
+  Columns 1 through 7
+
+    0.3538    0.4664    0.5009    0.5778    0.6679    0.7103    0.7076
+
+  Columns 8 through 14
+
+    0.6693    0.5846    0.5156    0.4812    0.4597    0.4107    0.3327
+
+  Columns 15 through 21
+
+    0.2611    0.2390    0.2500    0.2978   18.0000   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+
+BER1 =
+
+  Columns 1 through 7
+
+    0.3538    0.4664    0.5009    0.5778    0.6679    0.7103    0.7076
+
+  Columns 8 through 14
+
+    0.6693    0.5846    0.5156    0.4812    0.4597    0.4107    0.3327
+
+  Columns 15 through 21
+
+    0.2611    0.2390    0.2500    0.2978    0.3781   19.0000   20.0000
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+
+BER1 =
+
+  Columns 1 through 7
+
+    0.3538    0.4664    0.5009    0.5778    0.6679    0.7103    0.7076
+
+  Columns 8 through 14
+
+    0.6693    0.5846    0.5156    0.4812    0.4597    0.4107    0.3327
+
+  Columns 15 through 21
+
+    0.2611    0.2390    0.2500    0.2978    0.3781    0.4445   20.0000
+
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+
+BER1 =
+
+  Columns 1 through 7
+
+    0.3538    0.4664    0.5009    0.5778    0.6679    0.7103    0.7076
+
+  Columns 8 through 14
+
+    0.6693    0.5846    0.5156    0.4812    0.4597    0.4107    0.3327
+
+  Columns 15 through 21
+
+    0.2611    0.2390    0.2500    0.2978    0.3781    0.4445    0.4733
+
+</pre><pre class="codeinput"> <span class="keyword">end</span>
+</pre><h2 id="50">disp theta vs ber graph</h2><pre class="codeinput"><span class="keyword">if</span> a==1
+    figure(2)
+    plot(theta, BER10)
+    title(<span class="string">'impact of the Receiver s Phase Error with SNR = 10'</span>)
+<span class="keyword">else</span> a==2
+    figure(3)
+    plot(theta, BER1)
+    title(<span class="string">'impact of the Receiver s Phase Error with SNR = 1'</span>)
+<span class="keyword">end</span>
+
+xlabel(<span class="string">'Receiver oscillator s phase'</span>)
+ylabel(<span class="string">'BER values'</span>)
+
+grid
+</pre><img vspace="5" hspace="5" src="parta_02.png" alt=""> <pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+</pre><img vspace="5" hspace="5" src="parta_03.png" alt=""> <pre class="codeinput"><span class="keyword">end</span>
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2020b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% QPSK Modulator/Demodulator Example
+% This documents describes/implements the QPSK modulation and
+% demodulation of a song signal. 
+
+%%
+%      Prepared for ELEC 301
+
+%%
+%     by Alper T. Erdogan 
+
+%%
+%            *16.03.2020*    
+
+%%
+% edited by    Yakup Enes Güven 64045
+ 
+
+%% Program Initialization
+%Clear Variables and Close All Figure Windows
+
+% Clear all previous variables
+clear
+% Close all previous figure windows
+close all
+
+%% Read and Display an Example Image 
+% *cameraman.tif* is an example gray-level image provided my matlab
+% 
+
+%%
+% Load the Cameraman Image
+Im = imread('cameraman.tif');
+% Extract part of the image
+Im=Im(51:100,101:150);
+
+%%
+% Display the image
+imshow(Im);
+
+
+%% Convert Image to  a Binary Vector
+% We need to convert the image to a binary bit sequence
+
+%%
+% Convert 256x256 image matrix to an image (column) vector (of size 256^2x1) by concatenating columns
+Imv=Im(:);
+
+%%
+% Convert each the number in each row to a binary vector
+Imvb=de2bi(Imv);
+
+%% 
+% Note that *Imvb* has size 256^2x8
+
+%%
+% Now generate a row vector containing all bits
+Imvbt=Imvb';
+s=Imvbt(:)';
+
+
+
+%% Generate Modulated Signal
+% QPSK Modulated Signal
+% 
+
+%%
+% From the single bit sequence generate a vector sequence
+sv=[s(1:2:end);
+    s(2:2:end)];
+
+
+%%
+% QPSK Constellation Mapper
+% [0;0]-> -1-i
+% [0;1]-> -1+i
+% [1;0]->  1-i
+% [1;1]->  1+i
+for k=1:size(sv,2)
+    switch num2str(sv(:,k)')
+        case '0  0'
+            c(k)=-1-i;
+        case '1  0'
+            c(k)=1-i;
+        case '0  1'
+            c(k)=-1+i;
+        otherwise 
+            c(k)=1+i;
+        end
+end
+% Normalize the power to 1
+c=c/sqrt(2);
+
+
+%%
+% Rectangle Modulation
+
+% Sample Rate
+Fsampling=2^19;
+% Sample Intervale
+Tsampling=1/Fsampling;
+% Symbol Rate
+Fsymbol=2^13;
+% Symbol Period
+Tsymbol=1/Fsymbol;
+% Number of Samples per Symbol Period
+Ns=Tsymbol/Tsampling;
+
+%%
+% Baseband Signal (samples)
+xb=kron(c,ones(1,Ns));
+
+%% 
+% Carrier frequency:
+
+%%
+% $f_c=60kHz$
+fc=60e3; % 60 kHz;
+
+%define theta
+theta=(0:pi/10:2*pi);
+
+%% to keep BER values for different SNR values
+BER10=(0:length(theta)-1);
+BER1=(0:length(theta)-1);
+%%
+
+for a=1:2
+ for i=1:length(theta) 
+     
+% Carrier signal:  _
+
+%%
+% $c(t)=cos(2\pi f_c t)$
+  
+t=(0:1:(length(xb)-1))*Tsampling;
+cost=cos(2*pi*fc*t);
+sint=sin(2*pi*fc*t);
+
+%%
+% Transmitter output
+
+%%
+% $x(t)=Re(xb(t))cos(2\pi f_c t)-Im(xb(t))sin(2\pi f_c t)$
+
+x=real(xb).*cost-imag(xb).*sint;
+
+
+%% Channel Effect
+% We add some noise
+
+%%
+% First calculate average signal energy (per sample)
+sigpow=mean(x.^2);
+
+%%
+% Define SNR level in (dB)
+if a==1
+    SNR=10;
+else a==2 
+    SNR=1;
+end
+
+%% 
+% Noise Level
+NoiseAmp=sqrt(10^(-SNR/10)*sigpow);
+
+%%
+% Generate Noise signal as Gaussian Noise
+noise=NoiseAmp*randn(1,length(x));
+
+%% 
+% Noisy received signal
+
+%% 
+% $y(t)=x(t)+n(t)$
+y=x+noise;
+
+%% The QPSK Receiver Processing
+% Coherent QPSK Receiver operation
+
+%%
+% First extract real component baseband signal
+
+%%
+% $u_r(t)=2x(t)cos(2\pi f_c t)$
+
+ur=2*y.*cos((2*pi*fc*t)+theta(i));
+
+%%
+% Then low pass filter this signal
+
+%%
+% $z_r(t)=u_r(t)*h_{LP}(t)$
+
+zr = lowpass(ur,30e3,Fsampling);
+
+
+
+%%
+% Then extract the imaginary component baseband signal
+
+%%
+% $u_i(t)=2x(t)sin(2 \pi f_c t)$
+
+ui=-2*y.*sin((2*pi*fc*t)+theta(i));
+
+%%
+% Then low pass filter this signal
+
+%%
+% $z_i(t)=u_i(t)*h_{LP}(t)$
+
+zi = lowpass(ui,30e3,Fsampling);
+
+%%
+% Basband signal
+z=zr+i*zi;
+
+%% Constellation Estimates
+% We sample the baseband received signal to get noisy estimates of
+% transmitted constellation point. This is not the best way though. Any
+% other suggestions for improvement?
+
+ce=z(ceil(Ns/2):Ns:length(z));
+
+
+%% Bit Estimates
+% We implement QPSK Demapper to extract bits from constellation estimates
+
+%%
+% Check which quadrant ce lies in
+ser=real(ce)>0;
+sei=imag(ce)>0;
+se(1:2:(2*length(ser)))=ser;
+se(2:2:(2*length(ser)))=sei;
+
+%% 
+% Calculate Bit Error Rate 
+
+if a==1
+    BER10(i)=sum(se~=s)/length(s)
+else a==2
+    BER1(i)=sum(se~=s)/length(s)
+end
+
+
+ end
+%% disp theta vs ber graph
+
+if a==1
+    figure(2)
+    plot(theta, BER10)
+    title('impact of the Receiver s Phase Error with SNR = 10')
+else a==2
+    figure(3)
+    plot(theta, BER1)
+    title('impact of the Receiver s Phase Error with SNR = 1')
+end
+
+xlabel('Receiver oscillator s phase')
+ylabel('BER values')
+
+grid
+
+end
+
+##### SOURCE END #####
+--></body></html>
